@@ -1,0 +1,115 @@
+Lecture 1. 수업의 개요
+1.수업의 개요
+nature of learning
+칭찬과 비판이 다 훈련에 도움이된다
+reinforcement learning
+환경속에서 actor가 action을 취함
+그 환경속에서 관찰이나,state가 달라짐
+잘하면 reward를 줌
+
+Lecture 2. OpenAI GYM 게임해보기
+1. 이론 - OpenAI GYM 게임해보기
+Frozen Lake와 다른 모든 게임의 형태
+Agent- action(r,l,u,d)-environment-state,reward
+하지만 
+agent입장에서는 environmnet가 보이지 않음
+그렇기 때문에 쉽지가 않음
+
+2. 실습 - OpenAI GYM 게임해보기
+다 알고 있는 상태에서 움직여보기
+openai gym 설치
+inkey 함수를 통해 key값 받아오기 <- ,->,^,v
+is_slippery : false
+
+
+Lecture 3: Dummy Q-learning (table)
+이론 - Dummy Q-learning (table)
+다 가려진 상태에서 움직여보기
+random - 확률이 너무 낮음
+Q가(state,action) -> quality(reward)를 알려줌
+Q(s1,left): 0
+Q(s1,right): 0.5
+Q(s1,up): 0
+Q(s1,down): 0.3
+-> 이럴경우 가장 큰 max 값 -> argmax Q(s1,a)-> right을 선택
+policy 는 ㅠ(파이로 표현)
+* 는 옵티마이즈
+
+나는 현재 s에 있고 a라는 action을 취할 것이고 r이라는 reward를 받을 것이다
+그리고 q는 (s',a')에 있다는 전제!!
+
+Q(S,A) = r + Q(S',A')
+r=1이 되면 done(끝)
+무한루프를 실행하면서 최고의 reward를 더해서 q를 업데이트 시킴
+
+실습 - Dummy Q-learning (table)
+np.zeros(다 0으로 체우는 배열)
+16*4를 직접 입력해줘도되지만
+env.space,env.action으로 적어줘도됌
+환경초기화시키고 첫번째 state를 가져옴
+무한반복 = while not done:
+rargmax(다 0000이면 random-argmax 선택)
+reward를 더하고 새로운 상태로 업데이트
+살짝문제가 있어서 그걸 고쳐보는 실습 다음시간 예정
+
+
+Lecture 4: Q-learning exploit&exploration and discounted reward
+1.이론 - Q-learning exploit&exploration and discounted reward
+dummy의 문제점-새로운길을 찾을 필요가 있다(현재있는 값vs 모험 값)
+1)decaying e-greedy
+e = 0.1/(i+1) -> 점점 값이 작아져서 덜 랜덤하게 감
+
+2)add random noise
+노이즈를 랜덤으로 더한다
+i값이 커질수록 랜덤값을 줄여나감
+노이즈를 더해 나가면 1번과 다르게 그래도 값이 높은 다른 선택권들이 당첨될 확률이 올라감
+
+learning with discounted future reward
+나중에 받는 reward 값은 감마를 곱해서 더 낮은 값을 받음
+(추후에 받는 보상값은 적게 더함) 감마=0.9정도
+
+convergence 
+Q는 과연 가깝게 갈것인가- 2가지 조건 필요
+1. 같은 상을 받는다
+2. 상태의 수가 유한할때
+
+
+2.실습 - Q-learning exploit&exploration and discounted reward
+첫번째방법)
+add random noise 앞에 감마를 곱한체로 랜덤값을 줄여나감 
+action 후 q 업데이트
+현재 reward + discount(reward)
+해서 마지막에 q값을 출력하면 
+0,1 뿐만아니라 0.97 등 숫자가 나옴
+
+두번째방법)
+decaying e-greedy e = 0.1 / (i+1)
+를 이용해서 값을 선택함
+해서 마지막에 q값을 출력하면 
+0,1 뿐만아니라 0.97 등 숫자가 나옴
+
+Lecture 5: Q-learning in non-deterministic world
+이론 - Q-learning in non-deterministic world
+deterministic 항상정해져있다
+is_slippery : False : 미끄럽지 않게 하라 
+(우리가 기존에 하던것)
+
+nondeterministic 항상 다르다
+is_slippery : True : 미끄럽게 해라
+(우리가 원하는 key를 눌러도 그대로 가지않음)
+-> q-learning은 안됌, 왜? 항상 다르기때문에 멘토를 여러명 둔다
+q를 사용할때 정보를 조금만 사용한다
+learning rate, 알파 
+알파 = 0.1 (10%)
+자기고집은 90%만 (1-알파)
+실제값q 상상하는값q는 같아질까? -> 많이 반복할 경우 같아진다
+
+실습 - Q-learning in non-deterministic world
+readchar 를 이용해서 키를 입력받음-os환경때문에
+Q를 그대로 믿으면 결과가 랜덤보다 낮게나옴
+Q를 10%(learning rate :0.1)만 받아오고 내 고집 90%를 사용
+(%learning rate 이 크면 더 빨리 학습함%)
+그러면 성공률이 55~60프로정도 나옴(인간보다훨씬높은것임)
+
+Lecture 6: Q-Network
+

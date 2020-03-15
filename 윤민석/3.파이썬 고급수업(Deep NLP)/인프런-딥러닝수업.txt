@@ -1,0 +1,465 @@
+(1) 머신러닝의 개념과 용어
+1-1 머신러닝의 개념과 용어
+지도학습-dataset 넣어줌   = label
+비지도학습
+
+1-2 TensorFlow의 설치및 기본적인 operations (new)
+data flow - node들의 집합(하나의 작동)
+data=tensor 라고부름
+
+그래서 tensflow라고 부름
+
+input - > 그래프빌드-> 세션만들기-> 세션run ->output(업데이트 or 리턴)
+placeholder = 값을 넘겨주는 형태 (n개의 값 계산 가능)
+
+array 형태로 줌 tensor
+1. rank= (차원,scalar,vector,matrix)
+2. shape(형태) ex)t=[[1,2,3],[4,5,6],[7,8,9]] ->[3,3]
+3. type =ex) tf.float32, tf.int32 
+
+(2) Linear Regression 의 개념
+2-1 Linear Regression의 Hypothesis 와 cost
+regression - (모델)
+7시간 공부하면 몇점이나올까 regression에 물어보면 y값이 나옴
+
+linear(y=wx+b) = 세상의 많은 이론이 해당한다(다수의 모델)
+1. 여러 가설을 세움
+2. cost(loss) function=실제 데이터와 가 설과의 거리가 가까운지 먼지 계산
+3. 가설과의 차이를 제곱(음수 제거 + 차이가크면 패널티부과)으로 계산
+4. 가장 적은 값(w,b)의 값을 구하기
+
+2-2 Tensorflow로 간단한 linear regression을 구현 (new)
+1. 그래프빌드
+variable- 학습하는과정에서 변화시키는 변수
+reduce-mean- 평균구하기
+optimizer - 매직
+minimize(cost) - 최소화
+2. 세션run(실행)
+세션정의(feed_dict)
+global_variables_initialize 해주기
+step % 20 - 20번마다 출력
+placeholder - 값을 직접주지 않고 주는 방법
+(값을 따로 넘겨줄수있다)
+3. output, 업데이트
+
+(3) Linear Regression cost 함수 최소화
+3-1  Linear Regression의 cost 최소화 알고리즘의 원리
+w,b 값 최소 , cost 최소화
+gradient descent 알고리즘(경사를 따라 내려는간다)
+어떤점에서 시작하든간에 최대점에 도달함-convex function
+미분을 통해 경사도 측정하는 방식
+
+3-2 Linear Regression 의 cost 최소화의 TensorFlow 구현(new)
+w와 cost를 저장할 리스트를 만듬
+w(현재의값)-기울기(미분한값)
+알파= learning rate 보통 0.1
+assign 함수 (새로운 w로)
+어렵게 미분하지말고 optimizer = gradientdescentoptimizer
+잘못된값을 넣어도 잘되는 것 확인하기
+
+수식적 = 자동적 같은지 확인
+
+(4) 여러개의 입력(feature)의 Linear Regression
+4-1 multi-variable linear regression (new)
+cost function = 예측값-실제값의 제곱
+변수값 여러개
+w1x1=x1w1 matrix를 쓰면 순서가 바뀜 W로 씀 h(x)=XW
+
+4-2 multi-variable linear regression을 TensorFlow에서 구현하기
+1e-5 은 0.001 처럼 계산하는것
+학습시킬때 train을 돌릴때 cost, 가설을 같이 계산함(기존과 동일한데 확정된것임)
+matrix shape에서 placeholder에서 x의 개수만큼 적어주기  n개는 none으로 표시
+
+4-3  TensorFlow로 파일에서 데이타 읽어오기 (new)
+csv파일 읽어올때 형식 정하기
+slicing을 통해 범위정할수있음
+queue runners - 여러개의 파일을 큐에 쌓게되고 reader->decoder->다시 큐로 쌓아서 사용함
+1. file list 를 만들고
+2. reader 정의 (key, value)
+3. record_default  (value, 값)
+
+
+(5) Logistic (Regression) Classification
+5-1 Logistic Classification의 가설 함수 정의
+binary calssification - 0 ,1 두개로 분류해줌
+ex)스팸문자, 주식시장(살까팔까)
+문제점- linear regression에서 합격했는데도 불구하고 불합격한다는 기울기가 생길수있음
+해결- sigmoid(logistic function)으로 해결 0<z<1
+
+5-2 Logistic Regression의 cost 함수 설명
+어느지점에 시작하냐에따라 평평한 부분이 달라질수있음
+(여러 local miniuim이 생김)
+가장 좋은건 global miniuim 찾아야함
+-> new cost function for logistic(log함수를 사용)
+y=1 일때
+h(x)=1 ->cost가 0은 가장 잘 맞다는 것
+h(x)=0 -> cost가 무한대로 감
+y=0 일때는 반대
+y를 나눠야하는게 헷갈리니까 하나의 식으로 만들어버림
+tensorlfow에서는 함수 gradientdscentoptimazer를 사용하면됌
+
+5-3 TensorFlow로 Logistic Classification의 구현하기(new)
+matrix(x,w)
+w=(x,y)
+b=(y)
+예제1 직접해보기?
+
+(6) Softmax Regression (Multinomial Logistic Regression)
+6-1 Multinomial 개념 소개(softmax)
+sigmod를 통해 y가 0과1사이의 값으로 나오게 해줘야한다
+그리고 y를 다 더하면 1이 되는 결과를 나오게 해줘야한다
+3개 등급을 3개의 선으로 나눈다
+H= A or not
+H= B or not
+H= C or not
+
+6-2 Cost 함수 소개
+softmax = 1) y는 0부터 1사이의 값 2) 전체 y값의 합은 1
+cross-entropy cost function
+- s(y) 예측값 = y(hat)
+- L = y
+cost 값은 0인게 가장 좋은 것
+
+6-3 TensorFlow로 Softmax Classification의 구현하기 (new)
+score-> softmax를 통과시키면 ->확률로 나옴 (0~1), 모든 확률의 합은 1
+cross-entropy = y*log(y-hat)
+y= one-hot (y값 중 1가지만 1로 표시.. 나머지는 0)
+
+6-4 TensorFlow로 Fancy Softmax Classification의 구현하기 (new)
+softmax-cross-entropy-with-logits 라는 함수를 tensorflow에서 제공해줌
+logit(=가설값) 을 넣어줘서 평균을 내면 cost가 만들어진다
+one-hot = 차원은 +1차원으로 변경됌
+reshape = 차원을 줄여줌(원하는대로 형식맞춰줌) 
+argmax= 확률을 실제값(예제:0~6) 중 하나로 만들어줌
+flatten = shape을 맞춰줌
+zip= 리스트를 각각 요소별로 묶어주는 함수
+
+(7) ML의 실용과 몇가지 팁
+7-1 학습 rate, Overfitting, 그리고 일반화 (Regularization)
+알파값 learning_rate=0.01 로 보통 정하는데
+1) learning rate 설정 수치 문제 
+너무 큰 숫자면 경사면에서 튕겨나가서 overshooting이 일어날수있다
+너무 작은 숫자면 경사면에서 최저치까지 너무 오래걸린다
++
+local minima에서 멈춰버린다(gobal 로 가야함)
+
+2) 데이터 문제
+Data(x)를 graient descent 에서 가장 중심점으로 가야되는데
+데이터 값의 큰 차이가 있을때 데이터를 normailze해야한다
+그중에서는 zero-centered data, normalized data 가 있다
+standardization = std 파이썬 함수로 데이터 처리
+
+3) overfitting 문제(그래프를 구부리지말고 펴자)
+model을 학습자료에 맞게 너무 잘맞추려고 하려고 한다면 문제가 발생한다
+해결방법
+a. training data 의 양이 많아진다
+b. 특징 수(중복수)를 줄인다
+c. regularization - 일반화 시킨다 - weight의 값을 줄인다
+
+
+7-2 Training/Testing 데이타 셋
+(일반적)
+70% traing data set - > 모델 학습
+30% test data set - > y-hat(예측값) 과 비교하기 실제값 비교하기
+
+(추가로)
+70%의 training data set을 가지고 training, validation 으로 또 나눠서
+traning으로 모델을 만들고 validation으로 모델을 튜닝함
+
+(online learning)
+100만개중 10만개씩 나눠서 모델에 학습시키기
+
+
+7-3 training/test dataset, learning rate, normalization (new)
+training data set과 test data set을 나누는 방법
+learning rate의 2가지 문제를 신경써야함
+그러다가 가끔 nan을 만날수 있는데
+data 에 너무 큰 값들이 중간에 주어지면 non-nomalized inputs 때문에 문제가 생긴다
+min-max scale로 normalized 시킴(0~1사이 값)
+
+7-4 Meet MNIST Dataset (new)
+one-hot 으로 데이터를 읽어올수있다
+0~9 까지 10까지 example을 출력으로 직접 해보기
+axis=1 은 축을 나타냄
+training epoch/batch
+batch_size 한번에 몇개의 데이터를 학습시킬지(나눠서)
+epoch (전체 데이터 셋을 몇번 공부시킬지)
+
+accuracy.eval()  = sses.run() 
+
+(8) 딥러닝의 기본 개념과, 문제, 그리고 해결
+8-1 딥러닝의 기본 개념: 시작과 XOR 문제
+뇌를 본따 Activation Functions를 만듬
+and, or 는 가능
+xor는 불가능하다 - 문제발생
+backpropagation으로 - 문제해결
+여러 layer로 나눠서 학습시키는데 처음에러를 뒤로 보내질 못하는- 문제발생
+
+8-2 Back-propagation 과 2006/2007 ‘딥’의 출현
+breakthrough -> 초기값을 잘주면 된다 -> 깊게 신경망을 구축하면 복잡한 문제를 해결할수있다ㅏ
+deep learning의 시초(뉴럴의 이름을 바꾼것)
+
+8-3 Tensor Manipulation (new)
+Simple Id Array and Slicing
+rank = 차원
+shape = 속성갯 수 (= 차원갯수만큼 , 찍힘 [] 갯수별로 나누면됌)
+axis = 축 ( 맨앞 []가 0 맨마지막이 -1 or rank-1)
+matrix와 mulit 은 다르다(곱하기와 매트릭스)
+shape이 달라도 더하게 해주는게 Broadcasting이다
+reduce mean - axis(축)을 기준으로 평균을 구함
+reduce sum - axis(축)을 기준으로 합을 구함 
+argmax - axis(축)을 기준으로 가장 큰값의 위치를 구함
+reshape|중요| - 보통 가장안쪽의 값은 잘 건들지 않음(rank를 줄이거나 키우거나)
+reshape(squeeze,expand) - 값을 하나의 리스트로 줄이거나, 값을 여러개로 늘리거나
+one hot - 가장 큰 값 1가지만 1표 시하고 나머지는 0으로 표시
+casting - (float값을 int로 값 변경 혹은 , true false 를 1,0으로 바꿈
+stack - 쌓는 형태, axis을 이용해서 쌓는 x축기준 , y축기준으로 방법을 바꾼다
+ones and zeros like - x값을 모두 1로 체워진 값 혹은 x값을 모두 0으로 체워진 값으로 체운다
+zip - 한번에 값을 묶어서 사용하는 방법
+
+
+(9) Neural Network 1: XOR 문제와 학습방법, Backpropagation
+9-1 XOR 문제 딥러닝으로 풀기
+multiple neural network를 통해 해결
+
+9-2 10분안에 미분 정리하기
+미분(그래프에서 순간변화율)= 기울기
+f(x,y)=xy를 x로 미분하면 y
+f(x,y)=xy를 y로 미분하면 x
+f(g(x)) 각각 미분한것을 곱해줌
+
+9-3 딥넷트웍 학습 시키기 (backpropagation)
+xor에서 w1,w2,b1,b2 를 train 시킬수있을까?
+1. forward(실제값을 w , x, b을 넣어줌) - 미분값을 통해 chain rule 적용
+2. backward(연산자(+ , x)를 통해 뒤에서부터 미분해 나감)
+cost function을 알아내는 것도 마찬가지로 tensorboard에서 사용할수있다
+
+9-4 XOR을 위한 텐스플로우 딥넷트웍 (new)
+XOR data set을 logistic regression을 사용해서 모델을 만들면 된다
+그러면 정확도가 0.5가 나온다 ->문제발생
+neural net을 사용하는데 이때 weight의 크기를 잘 정해준다
+layer를 하나 더 만들어서 2번째 layer에 넣어준다 ->문제해결
+wide nn 을 해도 똑같은 결과가 나왔다(모델이 더 잘 학습됐다)
+deep nn 을 해도 똑같은 결과가 나왔다(모델이 더 잘 학습됐다)
+
+9-5 Tensor Board로 딥네트웍 들여다보기 (new)
+
+깔끔하게 중간 과정을 그래프로 보게하기
+5개의 step이 있다
+1. 어떤 값을 logging 할지 정하기(w,cost)
+2. merge 함수를 사용해서 summary 함수를 돌려받음
+3. summary를 file에 정해서 담고 그래프로 담아달라고 한다
+4. summary 자체도 tensor이기 때문에 run을 해줘야한다 
+-> summary add한 결과를 file에 write해준다 (step 값: 0~n)
+5. tensorboard 에 파일을 켜준다->scalar(1개의 값),histogram(여러개의 값) tensor에 볼수있다
+-> local -> server -> web으로 접속가능
+-> 이때 multiple runs 를 통해 여러 실험을 동시에 결과값을 볼수있다(learning rate 0.1/0.01) 
+
+name_scope 함수를 통해 layer별로 나눠서 안쪽 값을 정리할 수 있다
+
+(10) ReLU and 초기값 정하기 (2006/2007 breakthrough)
+10-1 XSigmoid 보다 ReLU가 더 좋아
+deep & wide
+w,b,l
+입력 출력이 보이지않는 부분은 (가운데부분)히든레이어 라고 부름
+poor result 문제 ->2,3단은 잘되는데 9,10단은 잘안됌
+뒤로갈수록 sigmod를 거쳐지면서 계속 작아져서 너무 작은 값이된다
+-> vanishing gradient 문제(점점 기울기가 사라짐)
+-> sigmoid를 잘못썼다
+-> ReLU -> 0보다 작으면 끄고 0보다 크면 살린다
+-> 마지막은 sigmod 처음부터 마지막전까지는 relu
+
+tanh도 가끔쓴다 (sigmod를 영점 기준으로 내린것)
+maxout이 relu보다 조금 더 좋음
+
+10-2 Weight 초기화 잘해보자
+초기값 w에 0을 줘선 안된다
+RBM을 사용해서 초기화 - > RECREATE INPUT을 통해
+FORWARD와 BACKWARD 값을 최대한 똑같게 초기화시킴
+FINE TUNNING - 레이어 끼리 계속 반복하면서 WEIGHT값을 초기화시킴
+ 노드 한개당 입출력에 따라 WEIGHT값 설정한다
+
+10-3 Dropout 과 앙상블
+overfitting 해결하기
+1. 학습데이터 많이 넣기
+2. feature 줄이기(굳이 그럴필요는 없음)
+3. regularization  - regularzation strength 를 곱해줘서 해결하기 (L2 REGULARZATION)
+
+Dropout - 랜덤하게 노드들을 비활성화 시키자
+tensorflow에서는 랜덤하게 dropout_rate 함수를 써서 layer 를 하나 더 만들어주면됌
+(학습하는동안에만!!!!)
+-> 실전에서는 모든 노드 활성화(dropout_rate = 1) 모두참여
+ensemble - 여러개의 학습모델을 합쳐서 새로 모델을 만드는 것
+
+10-4 레고처렴 넷트웍 모듈을 마음껏 쌓아 보자
+fast-forward - 노드를 몇개 씩 뛰어 넘어서 다음 노드에 값을 넣어줌
+split & merge - 노드를 중간에 나누거나 합해서 결과를 예측함
+recurrent network -> rnn 여러개로 나누고 합쳐서 하나의 유닛으로 만듬(자신만의 구조로만듬
+
+10-5 딥러닝으로 MNIST 98%이상 해보기(new)
+mnist(숫자판별) - 단을 구성할수록 정확도가 올라감
+기본 1단 layer -> 90%
+3단 layer ->94%
+xavier라는 초기화 함수를 이용 - >97%
+5단 + xavier 초기화 -> 97% ->overfitting 해서 더 안올라감
+dropout(keep 0.7) 도 추가 -> 98%
+optimizer(gradientDescent 등등) ->adam도 훌륭함 
+
+
+(11) Convolutional Neural Networks(cnn)
+11-1
+전체를 부분적으로 나누고 그 1개의 부분에서 1개의 숫자만 꺼낸다
+(=Wx+b 형태로)
+작아질때마다 정보를 잃어버려서 보통 가상의 테두리를 더 만들어줘서
+모서리 부분을 컴퓨터에 알려주고 정보를 더 살릴수있다.(pad+1)
+그러면 7*7->3*3이 아니라
+7*7 - 9*9 -> 7*7로 된다(기존크기)
+convolution layer를 많이 적용하면 점점 죽어든다 (filiter 개수가 다음 lay의 맨뒤숫자는 이어진다)
+
+11-2 ConvNet Max pooling 과 Full Network
+pooling 이란 sampling이다
+1개의 레이어층을 resize(sampling)한다
+다시 그 레이어들을 모아서 하나로 합쳐준다
+max pooling -> 가장큰값을 선택
+
+11-3 ConvNet의 활용 예
+AlexNet- 큰 칼라 이미지 - 필터도 크게
+googlenet- inception module 사용(병렬적으로 layer 사용)
+resnet- 3%대-> fast-forward 개념 이용 몇개layer를 점프하면서 layer를 합치면서 앞으로 나아감
+Alphago - convolutional network 사용
+
+11-4 TensorFlow CNN 의 기본
+1. convolution
+2. sampling(여러번)
+3. fully connected(forward-neu)
+이미지에 큰 기여를 하는데
+grey 1개 테스트해보기
+tt.nn.conv2d 라는 함수를 사용하면 다 옮기면서 마스크를 테스트할수있음
+padding = same -> 이미지랑 같은 사이즈로 나오게 한다
+filiter 개수가 이미지가 몇개 나오는지 결정
+
+11-5 TensorFlow로 구현하자 (MNIST 99%)
+1.layer 1 통과시키기
+padding = same -> (1,1) 기준 입력의 사이즈와 같게 나옴
+relu 통과후
+max_pooling 진행후
+결과를 가지고
+
+2.layer2 통과시키기
+동일 진행
+reshape 진행
+
+3.fully-connected layer로 합치기
+0~9 까지 10개 출력
+더 많이 진행하면 98%->99% 까지 가능하다
+
+11-6 Class, tf.layers, Ensemble (MNIST 99.5%)
+1. class로 코드 간단하게 하기
+2. tf.layers 패키지 이용
+
+Ensemble - 모델을 나눠서 전부 예측을 시키고 최종적으로 조합해서 결과를 내놓음
+class model 로 만들고
+모델을 리스트에 담는 형식
+모델 조합하기 - (간단하게 합해보는 예제)
+가장 큰 argmax 를 결과로 내보냄
+연습문제 - imagenet으로 해보기
+
+(12) Recurrent Neural Network
+12-1 NN의 꽃 RNN 이야기
+sequence data(순차적)를 알아야함 - nn/cnn은 각 단어별 의미를 파악못함
+->철자별로 이해함 (h,e,l,o)
+new state=W*(old state,x) - 모든 rnn에 대해 w의 값은 같다
+
+적용분야)
+speech, 연관검색어, 번역, 채팅봇, 이미지 캡처
+형태) 1:1(뉴럴네트워크) , 1:m(이미지 캡처), m:1(문자열), m:m(비디오,번역)
+rnn을 여러개의 layer로 만들 수 있다. -> LSTM 모델을 주로 사용
+
+12-2 RNN - Basic (new)
+1. cell 정해주기 - 출력의 크기( hidden_size=num_units이라고도 함)
+2. dynamic_rnn에 cell, 입력데이터(x) 넣어주기
+
+1,2를 나누는 이유는 -> cell 부분을 마음대로 수정할 수 있다
+
+one-hot encoding으로 구현가능(hello 기준)
+인풋 이미지는 4 필요함 -> output의 dim(마음대로 가능 ex:2) = hidden size
+sequence_length=5로 주면 rnn도 알아서 shape도 5로 펼쳐준다
+batch_size - 학습 데이터 사이즈(hello, eolll,lleel) 이런식으로 줌
+
+12-3 Hi Hello Training (new)
+h 다음 i가 나오는 경우
+h 다음 e가 나오는 경우 로 나눠지기 때문에 복잡함
+one-hot encoding으로 h,i,e,l,o 5개 하면됌
+
+sqence는 6개(문자열)
+1. cell 만들기(lstm을 이용해 rnn_size 5로 만들기)
+2. hidden_size=5(lstm 갯수),x input = 5(one-hot size), seqence=6(ihello),batch_size=1(문장1줄) 넣어주기
+3. 출력(sequence 사이즈)
+
+sequence_loss라는 함수 이용(예측y,weight)을 각각 다줌 
+중간에 output에 logit을 바로 output에 다시 넣는건 좋지않음
+이유는?(추후에..)
+
+12-4 Lab 12-3 : Long Sequence RNN (new)
+"if you want you" 해보기
+index-> char
+char-> index
+one_hot 함수를 이용해서 (num_classes 에 유일한 문자열만큼)
+나머지는 같음 -> 1500번 이상 훈련하면 잘되더라
+
+"3문장짜리 긴 문장"해보기
+여러개의 문장 배치 
+seqence_length (임의로 지정) ex:10
+batch_size (len)의 총 갯수만큼
+결과가 잘 안됌-> 왜 잘안될까? 
+logit이 매끄럽지 않고 ,rnn이 충분히깊지않음
+
+12-5 Stacked RNN + Softmax Layer (new)
+rnn을 여러층으로 쌓고 싶다
+기존 코드와 다 동일한대
+cell을 만들때 multirnncell 이라는 함수를 사용해서 만들면 되는데
+이때 출력을 정할때 *2 , *100 이런식으로 cell을 곱해서 쌓아서 만들면 된다
+rnn을 쭉 쌓고 마지막에 softmax를 붙혀주자(이과정이 좀 복잡한대)
+reshape을 통해 모아서 softmax에 넣어주고
+다시 softmax에서 나온 값을 reshape으로 펼쳐줌
+거기서 나온 output을 logit에다 넣어야함!!!!!!!
+그래서 softmax에서 나온 output을 넣어주고 loss 계산하면 됌
+마지막에 result를 다 모아서 출력해줌
+
+-> 나중에는 소스코드를 학습해서도 rnn으로 코드를 작성할수도있음
+
+12-6 Dynamic RNN (new)
+실전에서 sequence length를 정해서 주지 않는 때문에
+rnn은 가변하는 sequence를 받을 수 있어야함
+(문제발생) 기존에는 padding을 통해 임의로 체웠는데 결국엔 weight에 영향을 주기 땜누에
+(문제해결) tensorflow에서는 문자열을 줄때 길이를 알려줄 수 있게 함
+-> 그럼 나머지는 다 0으로 처리해줘서 loss를 헷갈리지 않게해줌
+
+12-7 RNN with Time Series Data (new)
+주식시장 예측하기(시간에 따라 값이 변동하는 데이터)
+sequence = 7(자료 수)
+data_dim = 5(변수)
+output =1(예측하는 날 값)
+
+array list_x 에 sequence로 쌓아준다
+train(0.7), test(0.3)로 나누고
+placeholder 설정하고
+cell 만들고
+lstm에 넣어서 실행 후
+fully_connected에 연결한다
+loss 를 정해지고 adamoptimizer -> minimize(loss)
+이제 training 학습시키고
+학습된 Y_pred에 test값을 넣어서 결과를 확인해봄->근접하게 나옴
+rnn을 이용한 다양한 학습
+
+(13) Deep Deep Network AWS 에서 GPU와 돌려보기 (powered bt AWS)
+13-1 powered by AWS
+
+(14) AWS 에서 저렴하게 Spot Instance 를 터미네이션 걱정없이 사용하기
+14-1
+(15) Google Cloud ML을 이용해 TensorFlow 실행하기
+15-1
+
+
+모델 저장하는 방법
+https://pytorch.org/docs/stable/notes/serialization.html
